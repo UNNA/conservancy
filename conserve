@@ -3,7 +3,12 @@
 #
 # conserve - mirror http sites for preservation on UNNA using wget
 #
-# MIT License
+# CHANGE LOG:
+#
+# v0.1   2021-04-18 - Morgan Aldridge <morgant@makkintosshu.com>
+#                     Initial version.
+#
+# MIT LICENSE:
 #
 # Copyright (c) 2021 Morgan Aldridge
 
