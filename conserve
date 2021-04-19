@@ -73,6 +73,19 @@ function find_missing_files() {
   fi
 }
 
+function get_wayback_machine_url() {
+  local success=false
+  local url="$1"
+
+  local wayback_url="$(curl -s "http://archive.org/wayback/available?url=${url}" | jq ".archived_snapshots.closest.available")"
+  if [ "${wayback_url}" != "null" ] && [[ "${wayback_url}" =~ ^"(.+)"$  ]] ; then
+    printf "${BASH_REMATCH[1]}"
+    success=true
+  fi
+
+  $success
+}
+
 function parse_wget_log_errors() {
   local log="$1"
   local current_path=""
@@ -89,6 +102,11 @@ function parse_wget_log_errors() {
         printf "%3i: %s\n" "${BASH_REMATCH[1]}" "${current_path}"
 
         find_missing_files "${current_path}"
+
+        local wayback_url="$(get_wayback_machine_url "${current_path}")"
+        if [ -n "${wayback_url}" ] ; then
+          printf "  Available in the Wayback Machine: %s\n" "${wayback_url}"
+        fi
       fi
     fi
   done < "${log}"
