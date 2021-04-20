@@ -7,6 +7,10 @@
 #
 # v0.1   2021-04-18 - Morgan Aldridge <morgant@makkintosshu.com>
 #                     Initial version.
+# v0.1.1 2021-04-20 - Morgan Aldridge
+#                     Check for missing files in Internet Archive Wayback
+#                     Machine. Check files for links to original host. Tweaks
+#                     to wget params.
 #
 # MIT LICENSE:
 #
