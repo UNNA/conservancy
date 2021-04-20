@@ -31,6 +31,20 @@
 # SOFTWARE.
 #
 
+function in_array() {
+  local found=false
+  local value="$1"
+  shift
+
+  if [ -z "$value" ] ; then $found ; fi
+  if [ ${#@} -lt 1 ] ; then $found ; fi
+  for array_value in "$@" ; do
+    if [ "$value" = "$array_value" ] ; then found=true ; fi
+  done
+
+  $found
+}
+
 function get_url_host() {
   local url="$1"
   local success=false
@@ -112,6 +126,25 @@ function parse_wget_log_errors() {
   done < "${log}"
 }
 
+function find_urls_to_update() {
+  local paths=()
+
+  while IFS= read -r line ; do
+    if [ -n "${line}" ] ; then
+      if [[ "${line}" =~ ^([^:]+) ]] ; then
+        if ! in_array "${BASH_REMATCH[1]}" "${paths[@]}" ; then
+          paths+=("${BASH_REMATCH[1]}")
+        fi
+      fi
+    fi
+  done <<< "$(grep -iR "//${host}" "${host}")"
+
+  printf "The following files may still contain links to %s:\n\n" "${host}"
+  for file in "${paths[@]}" ; do
+    printf "%s\n" "${file}"
+  done
+}
+
 # global variables
 date="$(date +%Y%m%d-%H%M%S)"
 url="$1"
@@ -144,4 +177,8 @@ LC_CTYPE="en_US.UTF-8" \
 if [ $? -gt 0 ] ; then
   printf "Mirroring of '%s' encountered some errors! Please review the log in '%s'.\n\n" "${url}" "${log}"
   parse_wget_log_errors "${log}"
+else
+  printf "Done.\n\n"
 fi
+
+find_urls_to_update
